@@ -8,26 +8,10 @@ from typing import Optional
 ENV_PROJECT_ROOT = "CORPUS_TOOL_ROOT"
 ENV_RAW_DATA_DIR = "RAW_DATA_DIR"
 
-def get_project_root() -> Path:
-    """Trouver la racine de l'Outils-de-traitement-de-corpus"""
-    current_dir = Path(__file__).absolute().parent
-    while current_dir != current_dir.parent:  # Arrêter à la racine
-        if current_dir.name == "Outils-de-traitement-de-corpus":
-            return current_dir
-        current_dir = current_dir.parent
-    raise FileNotFoundError("La racine n'a pas été trouvée")
-
-def get_data_dir() -> Path:
-    """Obtenir la direction pour enregistrer les données"""
-    if raw_dir := os.getenv(ENV_RAW_DATA_DIR):
-        return Path(raw_dir)
-    
-    # Outils-de-traitement-de-corpus/data/raw
-    return get_project_root() / "data" / "raw"
 
 def fetch_and_save(url: str) -> Optional[Path]:
     try:
-        save_dir = get_data_dir()
+        save_dir = Path.cwd()
         save_dir.mkdir(parents=True, exist_ok=True)
         
         # Le nom du fichier
@@ -48,7 +32,7 @@ def fetch_and_save(url: str) -> Optional[Path]:
         
         # enregistrer le fichier
         save_path.write_text(response.text, encoding='utf-8')
-        print(f"Le fichier enregistré dans: {save_path.relative_to(get_project_root())}")
+        print(f"Le fichier enregistré dans: {save_path.name}")
         return save_path
         
     except Exception as e:

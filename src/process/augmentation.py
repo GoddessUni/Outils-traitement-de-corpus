@@ -6,10 +6,15 @@ from sklearn.preprocessing import MultiLabelBinarizer
 from nltk.corpus import wordnet
 import nltk
 
+"""
+A partir des données que vous avez récupérées, augmentez vos données en créant un dataset synthétique.
+Choississez l’architecture adaptée à votre tâche et trouvez un modèle qui correspond à votre tâche et à cette architecture.
+"""
+
 nltk.download('wordnet')
 nltk.download('omw-1.4')
 
-CSV_PATH = "arxiv_abstracts_sampled100000.csv"  
+CSV_PATH = "arxiv_abstracts_head300.csv"  
 OUTPUT_PATH = "augmented_data.csv"              
 TEXT_FIELD = "abstract"
 LABEL_FIELD = "categories"

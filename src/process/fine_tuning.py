@@ -1,5 +1,13 @@
+import os
+"""
+Finetuner le modèle pretrained qui correspond le plus à vos données grâce au trainer d’hugging face
+"""
+
+os.environ["TORCH_DISTRIBUTED_DEBUG"] = "DETAIL"
+
 import torch
 
+# Mon ordinateur n'a pas de GPU indépendante, donc je n'utilise que le CPU
 def get_default_device():
     return torch.device("cpu")
 torch.get_default_device = get_default_device
@@ -13,6 +21,7 @@ from sklearn.metrics import f1_score
 AUG_DATA_PATH = "augmented_data.csv"
 df = pd.read_csv(AUG_DATA_PATH)
 
+# Convertir les multi-étiquettes à multi-hot vectors
 df["labels_list"] = df["labels"].apply(lambda x: x.split())
 
 mlb = MultiLabelBinarizer()
@@ -31,12 +40,14 @@ def tokenize_function(examples):
 
 tokenized_dataset = dataset.map(tokenize_function, batched=True)
 
+# Convertir les étiquettes à float
 def format_and_cast_labels(examples):
     examples["labels"] = [list(map(float, label)) for label in examples["labels"]]
     return examples
 
 tokenized_dataset = tokenized_dataset.map(format_and_cast_labels, batched=True)
 
+# Convertir le dataset de Hugging Face à PyTorch Tensor
 def transform(example):
     return {
         "input_ids": torch.tensor(example["input_ids"], dtype=torch.long),
@@ -54,6 +65,7 @@ model = AutoModelForSequenceClassification.from_pretrained(
 
 training_args = TrainingArguments(
     output_dir="./results",
+    save_strategy="no",
     learning_rate=2e-5,
     per_device_train_batch_size=16,
     per_device_eval_batch_size=16,
@@ -64,6 +76,7 @@ training_args = TrainingArguments(
     metric_for_best_model="f1",
 )
 
+# Evaluation: F-mesure
 def compute_metrics(pred):
     logits, labels = pred
     sigmoid = torch.nn.Sigmoid()

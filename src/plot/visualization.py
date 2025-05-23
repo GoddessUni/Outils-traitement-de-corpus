@@ -7,6 +7,10 @@ from nltk.tokenize import word_tokenize
 from collections import Counter
 import re
 
+"""
+Visualiser votre corpus et réaliser des statistiques de texte
+"""
+
 def setup_nltk():
     nltk.download('punkt', quiet=True)
     nltk.download('stopwords', quiet=True)
